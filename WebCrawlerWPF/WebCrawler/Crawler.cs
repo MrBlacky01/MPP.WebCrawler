@@ -109,6 +109,8 @@ namespace WebCrawler
 
         #endregion
 
+        #region Private
+
         /// <summary>
         /// Get CrawResult according url and depth
         /// </summary>
@@ -198,6 +200,8 @@ namespace WebCrawler
                 return true;
             }
         }
+
+        #endregion
 
         #endregion
 
