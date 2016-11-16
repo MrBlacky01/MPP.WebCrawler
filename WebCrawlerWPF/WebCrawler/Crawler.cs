@@ -6,7 +6,7 @@ using HtmlAgilityPack;
 
 namespace WebCrawler
 {
-    public class Crawler : ISimpleWebCrawler
+    public class Crawler : ISimpleWebCrawler, IDisposable
     {
         #region Fields
 
@@ -22,7 +22,7 @@ namespace WebCrawler
         /// <summary>
         /// Get or set depth of crawling.
         /// </summary>
-        private int CrawlingDepth
+        public int CrawlingDepth
         {
             get { return CrawlingDepth; }
             set
@@ -50,7 +50,7 @@ namespace WebCrawler
         /// <summary>
         /// Crawler Constructor.
         /// </summary>
-        Crawler(int _depth)
+        public Crawler(int _depth)
         {
             CrawlingDepth = _depth;
 
