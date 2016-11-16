@@ -12,7 +12,7 @@ namespace WebCrawlerWPF.Model
     {
         #region Fields
 
-        private readonly string configurationFile = "Configuration//CrawlerConfig.xml";
+        private readonly string configurationFile = "CrawlerConfig.xml";
         private readonly FileConfigurationSetter configurator;
 
         #endregion
@@ -43,12 +43,12 @@ namespace WebCrawlerWPF.Model
         public async Task<CrawlResult> GetCrawlerResult()
         {
             config = configurator.SetConfigurations();
-
+            
             using (Crawler crawler = new Crawler(config.Depth))
             {
                 return await crawler.PerformCrawlingAsync(config.UrlList.ToArray());
             }
-        }
+        }   
 
         #endregion
 
