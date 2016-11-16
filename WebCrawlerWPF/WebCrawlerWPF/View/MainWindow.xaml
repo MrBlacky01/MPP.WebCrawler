@@ -4,9 +4,20 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WebCrawlerWPF"
+        xmlns:localViewModel="clr-namespace:WebCrawlerWPF.ViewModel"
+        xmlns:converters="clr-namespace:WebCrawlerWPF.ViewModel.Converters"
         mc:Ignorable="d"
-        Title="WebCrawler" Height="250" Width="400">
+        Title="WebCrawler" Height="500" Width="800">
+    <Window.Resources>
+        <localViewModel:MainViewModel x:Key="CrawlerViewModel"/>
+        <converters:CrawlResultConverter x:Key="CrawlResultConverter" />
+    </Window.Resources>
     <Grid >
+        <TreeView x:Name="UrlTreeView" HorizontalAlignment="Left" Height="310" VerticalAlignment="Top" Width="610" Margin="15,15,0,0"
+                  ItemsSource="{Binding CrawlResult, Converter={StaticResource CrawlResultConverter}}"/>
+        <Button x:Name="button" Content="Do it"  HorizontalAlignment="Left" Margin="535,357,0,0" VerticalAlignment="Top" Width="75" 
+                Command="{Binding AsyncCrawlingCommand}"/>
+        
         <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" Margin="15,15,45,15"
                    Text="{Binding Path = ClickCount.Count, Mode=TwoWay}"/>
 
