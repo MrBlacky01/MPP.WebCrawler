@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Net.Http;
 using HtmlAgilityPack;
@@ -15,6 +16,7 @@ namespace WebCrawler
         /// </summary>
         private bool isDisposed;
 
+        private int crawlingDepth;
         #endregion
          
         #region Properties
@@ -24,16 +26,16 @@ namespace WebCrawler
         /// </summary>
         public int CrawlingDepth
         {
-            get { return CrawlingDepth; }
+            get { return crawlingDepth; }
             set
             {
                 if (CheckRightDepth(value))
                 {
-                    CrawlingDepth = 6;
+                    crawlingDepth = value;
                 }
                 else
                 {
-                    CrawlingDepth = value;
+                    crawlingDepth = 6;
                 }
             }
         }
@@ -53,7 +55,7 @@ namespace WebCrawler
         public Crawler(int _depth)
         {
             CrawlingDepth = _depth;
-
+            Client = new HttpClient();
         }
         #endregion
 
@@ -76,7 +78,7 @@ namespace WebCrawler
                 return new CrawlResult();
             }
 
-            CrawlResult result = new CrawlResult();
+            Dictionary<string, CrawlResult> result = new Dictionary<string, CrawlResult>();
             Task<CrawlResult>[] childs = new Task<CrawlResult>[_rootUrls.Length];
 
             for(int i = 0; i < _rootUrls.Length; i++)
@@ -88,10 +90,13 @@ namespace WebCrawler
 
             for(int i = 0; i < _rootUrls.Length; i++)
             {
-                result.Urls.Add(_rootUrls[i], childs[i].Result);
+                if (!result.ContainsKey(_rootUrls[i]))
+                {
+                    result.Add(_rootUrls[i], childs[i].Result);
+                }
             }
 
-            return result;
+            return new CrawlResult { Urls = result };
         }
 
         /// <summary>
@@ -116,16 +121,16 @@ namespace WebCrawler
         /// </summary>
         private async Task<CrawlResult> GetCrawresultFromUrl(string url, int currentDepth)
         {
-            CrawlResult result = new CrawlResult();
+            Dictionary<string,CrawlResult> result = new Dictionary<string, CrawlResult>();
             if(currentDepth <= CrawlingDepth)
             {
                 string htmlDocument = await LoadHtml(url);
                 if (htmlDocument == null)
                 {
-                    return result;
+                    return new CrawlResult();
                 }
 
-                List<string> urls = FindLinksInHtmlDocument(htmlDocument);
+                List<string> urls = new List<string>( FindLinksInHtmlDocument(htmlDocument));
 
                 Task<CrawlResult>[] childs = new Task<CrawlResult>[urls.Count];
 
@@ -138,10 +143,14 @@ namespace WebCrawler
 
                 for (int i = 0; i < urls.Count; i++)
                 {
-                    result.Urls.Add(urls[i], childs[i].Result);
+                    if (!result.ContainsKey(urls[i]))
+                    {
+                        result.Add(urls[i], childs[i].Result);
+                    }
                 }
+                
             }
-            return new CrawlResult();
+            return new CrawlResult { Urls = result};
         }
 
 
@@ -164,26 +173,33 @@ namespace WebCrawler
         /// <summary>
         /// Find all href tags in html document
         /// </summary>
-        private List<string> FindLinksInHtmlDocument(string html)
+        private ConcurrentBag<string> FindLinksInHtmlDocument(string html)
         {
-            HtmlDocument htmlDocument = new HtmlDocument();
-            htmlDocument.LoadHtml(html);
-
-            List<string> hrefList = new List<string>();
-            foreach (var tagA in htmlDocument.DocumentNode.Descendants("a"))
+            try
             {
-                if (tagA.Attributes.Contains("htef"))
+                HtmlDocument htmlDocument = new HtmlDocument();
+                htmlDocument.LoadHtml(html);
+
+                ConcurrentBag<string> hrefList = new ConcurrentBag<string>();
+
+                Parallel.ForEach(htmlDocument.DocumentNode.Descendants("a"), (link) =>
                 {
-                    string attribute = tagA.Attributes["href"].Value;
-                    if (attribute.StartsWith("http"))
+                    if (link.Attributes.Contains("href"))
                     {
-                        hrefList.Add(attribute);
+                        string attribute = link.Attributes["href"].Value;
+                        if (attribute.StartsWith("http"))
+                        {
+                            hrefList.Add(attribute);
+                        }
+
                     }
-
-                }
+                });
+                return hrefList;
             }
-            return hrefList;
-
+            catch(Exception e)
+            {
+                return null;
+            }
         }
 
         /// <summary>
