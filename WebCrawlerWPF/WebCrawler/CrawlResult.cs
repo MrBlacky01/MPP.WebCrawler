@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections.Generic;
 
 namespace WebCrawler
 {
@@ -9,7 +9,7 @@ namespace WebCrawler
         /// <summary>
         /// Get or set dictionary of CrawResults
         /// </summary>
-        public ConcurrentDictionary <string, CrawlResult> Urls { get; set; }
+        public Dictionary <string, CrawlResult> Urls { get; set; }
 
         #endregion
     }
