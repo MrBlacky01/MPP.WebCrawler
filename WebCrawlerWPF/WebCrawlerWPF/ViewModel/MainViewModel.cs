@@ -13,6 +13,7 @@ namespace WebCrawlerWPF.ViewModel
 
         private CrawlResult crawlResult;
         private readonly CrawlerModel crawlerModel;
+        private readonly AsyncCommand asyncCommand;
 
         #endregion
 
@@ -54,7 +55,7 @@ namespace WebCrawlerWPF.ViewModel
         /// <summary>
         /// Get or set asyncCommand
         /// </summary>
-        public AsyncCommand AsyncCrawlingCommand { get; set; }
+        public AsyncCommand AsyncCrawlingCommand => asyncCommand;
 
         #endregion
 
@@ -73,15 +74,14 @@ namespace WebCrawlerWPF.ViewModel
 
             ClickCountCommand = new Command(arg => LeftClickCountMethod());
 
-            AsyncCrawlingCommand = new AsyncCommand(
-                async() =>
+            asyncCommand = new AsyncCommand(async () =>
+            {
+                if (asyncCommand.CanExecute(null))
                 {
-                    if (AsyncCrawlingCommand.CanExecute(null))
-                    {
-                        CrawlResult = await crawlerModel.GetCrawlerResult();
-                    }
+                    CrawlResult = await crawlerModel.GetCrawlerResult();
                 }
-                );
+
+            });
 
         }
 
