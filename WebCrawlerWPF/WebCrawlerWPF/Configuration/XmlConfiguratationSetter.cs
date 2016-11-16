@@ -25,7 +25,7 @@ namespace WebCrawlerWPF.Configuration
             int depth = Int32.Parse( xdoc.Element("root").Element("depth").Value);
             List<string> rootResourses = new List<string>();
 
-            foreach(XElement root in xdoc.Element("rootResources").Elements("resource"))
+            foreach(XElement root in xdoc.Element("root").Element("rootResources").Elements("resource"))
             {
                 rootResourses.Add(root.Value);
             }

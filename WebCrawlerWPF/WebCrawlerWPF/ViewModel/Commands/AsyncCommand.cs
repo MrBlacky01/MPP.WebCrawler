@@ -12,14 +12,16 @@ namespace WebCrawlerWPF.ViewModel.Commands
         #region Fields
 
         private readonly Func<Task> _command;
+        private Func<object, bool> canExecute;
 
         #endregion
 
         #region Constructor
 
-        public AsyncCommand(Func<Task> command)
+        public AsyncCommand(Func<Task> command, Func<object, bool> _canExecute = null)
         {
             _command = command;
+            canExecute = _canExecute;
         }
 
         #endregion
@@ -28,7 +30,7 @@ namespace WebCrawlerWPF.ViewModel.Commands
 
         public override bool CanExecute(object parameter)
         {
-            return true;
+            return canExecute == null || canExecute(parameter);
         }
 
         public override Task ExecuteAsync(object parameter)
