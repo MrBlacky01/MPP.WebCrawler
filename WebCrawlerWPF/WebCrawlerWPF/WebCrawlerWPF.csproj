@@ -46,6 +46,9 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="WebCrawler">
+      <HintPath>..\WebCrawler\bin\Debug\WebCrawler.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -63,8 +66,18 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Configuration\CrawlerConfiguration.cs" />
+    <Compile Include="Configuration\FileConfigurationSetter.cs" />
+    <Compile Include="Configuration\IConfigurable.cs" />
+    <Compile Include="Configuration\XmlConfiguratationSetter.cs" />
     <Compile Include="Model\ClickCountModel.cs" />
-    <Compile Include="ViewModel\Command.cs" />
+    <Compile Include="Model\CrawlingModel.cs" />
+    <Compile Include="Model\Notifier.cs" />
+    <Compile Include="ViewModel\Commands\AsyncCommand.cs" />
+    <Compile Include="ViewModel\Commands\AsyncCommandBase.cs" />
+    <Compile Include="ViewModel\Commands\Command.cs" />
+    <Compile Include="ViewModel\Commands\IAsyncCommand.cs" />
+    <Compile Include="ViewModel\Converters\CrawlResultConverter.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -98,7 +111,9 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Configuration\CrawlerConfig.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
