@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace WebCrawlerWPF.ViewModel
 {
-    public class Command : ICommand
+    internal class Command : ICommand
     {
         #region Constructor
 
