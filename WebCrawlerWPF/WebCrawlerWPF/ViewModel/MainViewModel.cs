@@ -1,25 +1,18 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 using WebCrawlerWPF.Model;
+using WebCrawlerWPF.ViewModel.Commands;
+using WebCrawler;
 
 namespace WebCrawlerWPF.ViewModel
 {
-    class MainViewModel 
+    class MainViewModel : Notifier
     {
-        #region Constructor
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public MainViewModel()
-        {
-            ClickCountCommand = new Command(arg => LeftClickCountMethod());
+        #region Fields
 
-            ClickCount = new ClickCountModel
-            {
-                Count = 0
-            };
-        }
+        private CrawlResult crawlResult;
+        private readonly CrawlerModel crawlerModel;
 
         #endregion
 
@@ -30,9 +23,26 @@ namespace WebCrawlerWPF.ViewModel
         /// </summary>
         public ClickCountModel ClickCount { get; set; }
 
-        #endregion
+        /// <summary>
+        /// Get or set Result of Crawling
+        /// </summary>
+        public CrawlResult CrawlResult
+        {
+            get
+            {
+                return crawlResult;
+            }
+            set
+            {
+                if (crawlResult != value)
+                {
+                    crawlResult = value;
+                    OnPropertyChanged(nameof(CrawlResult));
+                }
+            }
+        }
 
-       
+        #endregion
 
         #region Commands
 
@@ -41,8 +51,41 @@ namespace WebCrawlerWPF.ViewModel
         /// </summary>
         public ICommand ClickCountCommand { get; set; }
 
+        /// <summary>
+        /// Get or set asyncCommand
+        /// </summary>
+        public AsyncCommand AsyncCrawlingCommand { get; set; }
+
         #endregion
 
+        #region Constructor
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public MainViewModel()
+        {           
+            crawlerModel = new CrawlerModel();
+            ClickCount = new ClickCountModel
+            {
+                Count = 0
+            };
+
+            ClickCountCommand = new Command(arg => LeftClickCountMethod());
+
+            AsyncCrawlingCommand = new AsyncCommand(
+                async() =>
+                {
+                    if (AsyncCrawlingCommand.CanExecute(null))
+                    {
+                        CrawlResult = await crawlerModel.GetCrawlerResult();
+                    }
+                }
+                );
+
+        }
+
+        #endregion
 
         #region Methods
 
